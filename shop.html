@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pub Method — Key Shop</title>
+<script src="https://www.paypal.com/sdk/js?client-id=AdDwcrFvRvMl_BM_Ib__rKegb8GoXLb-oQ7gkCATgMAzAR_cb0M_LNsFb10sDvsCLryM4HnnePqOfPaL&currency=EUR"></script>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { background:#08080f; font-family:'Segoe UI',sans-serif; color:white; min-height:100vh; }
+
+/* HERO */
+.hero { text-align:center; padding:60px 20px 40px; background:linear-gradient(180deg,#0d0d1f 0%,#08080f 100%); }
+.hero-badge { display:inline-block; background:rgba(124,58,237,0.15); border:1px solid rgba(124,58,237,0.4); color:#a78bfa; padding:6px 16px; border-radius:20px; font-size:12px; font-weight:700; letter-spacing:2px; margin-bottom:20px; }
+.hero h1 { font-size:48px; font-weight:900; background:linear-gradient(135deg,#a78bfa,#7c3aed,#4f46e5); -webkit-background-clip:text; -webkit-text-fill-color:transparent; margin-bottom:12px; }
+.hero p { color:#6b7280; font-size:16px; max-width:500px; margin:0 auto; }
+
+/* STEPS */
+.steps { display:flex; justify-content:center; gap:32px; padding:32px 20px; flex-wrap:wrap; }
+.step { display:flex; align-items:center; gap:10px; color:#6b7280; font-size:14px; }
+.step-num { width:28px; height:28px; background:rgba(124,58,237,0.2); border:1px solid #7c3aed; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:700; color:#a78bfa; flex-shrink:0; }
+.step-arrow { color:#374151; font-size:18px; }
+
+/* PLANS */
+.plans-section { padding:0 20px 60px; max-width:960px; margin:0 auto; }
+.plans-section h2 { text-align:center; font-size:22px; color:#e2e8f0; margin-bottom:32px; font-weight:700; }
+.plans-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(210px,1fr)); gap:20px; }
+
+.plan-card { background:#0f0f1e; border:1px solid #1e1e3a; border-radius:20px; padding:28px 24px; cursor:pointer; transition:all 0.2s; position:relative; }
+.plan-card:hover { border-color:#7c3aed; transform:translateY(-4px); }
+.plan-card.selected { border-color:#7c3aed; background:#13102a; box-shadow:0 0 30px rgba(124,58,237,0.2); }
+.plan-card.popular { border-color:#7c3aed; }
+.popular-badge { position:absolute; top:-12px; left:50%; transform:translateX(-50%); background:linear-gradient(135deg,#7c3aed,#4f46e5); color:white; font-size:10px; font-weight:700; padding:4px 14px; border-radius:20px; letter-spacing:1px; white-space:nowrap; }
+
+.plan-icon { font-size:32px; margin-bottom:14px; }
+.plan-name { font-size:16px; font-weight:700; color:#e2e8f0; margin-bottom:6px; }
+.plan-price { font-size:36px; font-weight:900; color:#a78bfa; margin-bottom:4px; }
+.plan-price span { font-size:16px; color:#6b7280; font-weight:400; }
+.plan-desc { font-size:12px; color:#6b7280; margin-bottom:16px; }
+.plan-features { list-style:none; }
+.plan-features li { font-size:12px; color:#9ca3af; margin-bottom:6px; display:flex; align-items:center; gap:8px; }
+.plan-features li::before { content:"✓"; color:#10b981; font-weight:700; }
+
+.select-btn { width:100%; margin-top:20px; padding:11px; background:rgba(124,58,237,0.15); border:1px solid rgba(124,58,237,0.4); border-radius:10px; color:#a78bfa; font-size:13px; font-weight:700; cursor:pointer; transition:all 0.2s; }
+.select-btn:hover, .plan-card.selected .select-btn { background:linear-gradient(135deg,#7c3aed,#4f46e5); border-color:transparent; color:white; }
+
+/* CHECKOUT */
+.checkout { max-width:520px; margin:0 auto 60px; padding:0 20px; }
+.checkout-card { background:#0f0f1e; border:1px solid #1e1e3a; border-radius:20px; padding:32px; }
+.checkout-card h3 { font-size:18px; color:#e2e8f0; margin-bottom:24px; font-weight:700; }
+label { display:block; font-size:10px; font-weight:700; color:#7c3aed; margin-bottom:6px; letter-spacing:1.5px; }
+input[type=text] { width:100%; padding:13px 16px; background:#0a0a14; border:1px solid #1e1e3a; border-radius:12px; color:white; font-size:14px; outline:none; transition:border 0.2s; margin-bottom:20px; }
+input[type=text]:focus { border-color:#7c3aed; }
+.order-summary { background:#0a0a14; border:1px solid #1e1e3a; border-radius:12px; padding:16px; margin-bottom:20px; }
+.order-row { display:flex; justify-content:space-between; align-items:center; font-size:13px; color:#9ca3af; margin-bottom:8px; }
+.order-row:last-child { margin-bottom:0; border-top:1px solid #1e1e3a; padding-top:10px; margin-top:4px; color:#e2e8f0; font-weight:700; font-size:15px; }
+.error-msg { background:rgba(239,68,68,0.08); border:1px solid rgba(239,68,68,0.2); color:#ef4444; padding:10px 14px; border-radius:10px; font-size:12px; margin-bottom:16px; display:none; }
+#paypal-button-container { min-height:50px; }
+
+/* SUCCESS */
+.success-screen { display:none; max-width:520px; margin:0 auto 60px; padding:0 20px; }
+.success-card { background:#0f0f1e; border:1px solid #059669; border-radius:20px; padding:40px 32px; text-align:center; }
+.success-icon { font-size:56px; margin-bottom:16px; }
+.success-card h2 { font-size:24px; color:#10b981; margin-bottom:8px; font-weight:800; }
+.success-card p { color:#6b7280; font-size:14px; margin-bottom:24px; }
+.key-display { background:#0a0a14; border:1px solid #2d1b69; border-radius:12px; padding:16px; margin-bottom:16px; }
+.key-label { font-size:10px; color:#7c3aed; font-weight:700; letter-spacing:1.5px; margin-bottom:8px; }
+.key-value { font-family:monospace; font-size:13px; color:#a78bfa; word-break:break-all; font-weight:700; }
+.copy-key-btn { width:100%; padding:13px; background:linear-gradient(135deg,#059669,#047857); border:none; border-radius:12px; color:white; font-size:14px; font-weight:700; cursor:pointer; margin-bottom:12px; }
+.info-box { background:rgba(124,58,237,0.08); border:1px solid rgba(124,58,237,0.2); border-radius:12px; padding:14px; font-size:12px; color:#a78bfa; text-align:left; }
+
+/* NAV */
+nav { display:flex; align-items:center; justify-content:space-between; padding:16px 32px; background:#0a0a14; border-bottom:1px solid #1e1e3a; }
+.nav-logo { font-size:18px; font-weight:900; background:linear-gradient(135deg,#a78bfa,#7c3aed); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
+.nav-badge { background:rgba(16,185,129,0.12); color:#10b981; border:1px solid rgba(16,185,129,0.3); padding:4px 12px; border-radius:20px; font-size:11px; font-weight:700; }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-logo">⚡ Pub Method</div>
+  <div class="nav-badge">🔒 Pago seguro con PayPal</div>
+</nav>
+
+<div class="hero">
+  <div class="hero-badge">KEY SHOP</div>
+  <h1>Pub Method Keys</h1>
+  <p>Acceso premium al Admin Panel. Elige tu plan y paga de forma segura con PayPal.</p>
+</div>
+
+<div class="steps">
+  <div class="step"><div class="step-num">1</div> Elige tu plan</div>
+  <div class="step-arrow">→</div>
+  <div class="step"><div class="step-num">2</div> Introduce tu usuario de Roblox</div>
+  <div class="step-arrow">→</div>
+  <div class="step"><div class="step-num">3</div> Paga con PayPal</div>
+  <div class="step-arrow">→</div>
+  <div class="step"><div class="step-num">4</div> Recibe tu key al instante</div>
+</div>
+
+<div class="plans-section">
+  <h2>Elige tu plan</h2>
+  <div class="plans-grid">
+
+    <div class="plan-card" onclick="selectPlan('1day', this)">
+      <div class="plan-icon">⏰</div>
+      <div class="plan-name">1 Día</div>
+      <div class="plan-price">3€ <span>/ día</span></div>
+      <div class="plan-desc">Perfecto para probar</div>
+      <ul class="plan-features">
+        <li>Acceso completo 24h</li>
+        <li>Friend TP</li>
+        <li>Anti Leave</li>
+        <li>Admin Panel</li>
+      </ul>
+      <button class="select-btn">Seleccionar</button>
+    </div>
+
+    <div class="plan-card" onclick="selectPlan('1week', this)">
+      <div class="plan-icon">📅</div>
+      <div class="plan-name">1 Semana</div>
+      <div class="plan-price">8€ <span>/ semana</span></div>
+      <div class="plan-desc">La opción más popular</div>
+      <div class="popular-badge">⭐ MÁS POPULAR</div>
+      <ul class="plan-features">
+        <li>Acceso completo 7 días</li>
+        <li>Friend TP</li>
+        <li>Anti Leave</li>
+        <li>Admin Panel</li>
+      </ul>
+      <button class="select-btn">Seleccionar</button>
+    </div>
+
+    <div class="plan-card" onclick="selectPlan('1month', this)">
+      <div class="plan-icon">🗓️</div>
+      <div class="plan-name">1 Mes</div>
+      <div class="plan-price">15€ <span>/ mes</span></div>
+      <div class="plan-desc">Mejor relación calidad-precio</div>
+      <ul class="plan-features">
+        <li>Acceso completo 30 días</li>
+        <li>Friend TP</li>
+        <li>Anti Leave</li>
+        <li>Admin Panel</li>
+      </ul>
+      <button class="select-btn">Seleccionar</button>
+    </div>
+
+    <div class="plan-card" onclick="selectPlan('permanent', this)">
+      <div class="plan-icon">♾️</div>
+      <div class="plan-name">Permanente</div>
+      <div class="plan-price">20€ <span>/ siempre</span></div>
+      <div class="plan-desc">Paga una vez, úsalo siempre</div>
+      <ul class="plan-features">
+        <li>Acceso ilimitado</li>
+        <li>Friend TP</li>
+        <li>Anti Leave</li>
+        <li>Admin Panel</li>
+      </ul>
+      <button class="select-btn">Seleccionar</button>
+    </div>
+
+  </div>
+</div>
+
+<div class="checkout" id="checkout" style="display:none">
+  <div class="checkout-card">
+    <h3>💳 Completar compra</h3>
+    <label>TU USUARIO DE ROBLOX</label>
+    <input type="text" id="roblox-username" placeholder="Ej: soybaby1207" oninput="this.value = this.value.toUpperCase()">
+    <div class="order-summary">
+      <div class="order-row"><span>Plan</span><span id="summary-plan">—</span></div>
+      <div class="order-row"><span>Duración</span><span id="summary-duration">—</span></div>
+      <div class="order-row"><span>Total</span><span id="summary-price">—</span></div>
+    </div>
+    <div class="error-msg" id="checkout-error"></div>
+    <div id="paypal-button-container"></div>
+  </div>
+</div>
+
+<div class="success-screen" id="success-screen">
+  <div class="success-card">
+    <div class="success-icon">🎉</div>
+    <h2>¡Pago completado!</h2>
+    <p>Tu key ha sido generada. Cópiala y úsala en el juego.</p>
+    <div class="key-display">
+      <div class="key-label">TU KEY</div>
+      <div class="key-value" id="result-key">—</div>
+    </div>
+    <div class="key-display">
+      <div class="key-label">EXPIRA</div>
+      <div class="key-value" id="result-expiry">—</div>
+    </div>
+    <button class="copy-key-btn" onclick="copyResultKey()">📋 Copiar Key</button>
+    <div class="info-box">⚡ Guarda tu key en un lugar seguro. Introdúcela en el botón <strong>Codes</strong> del juego para activarla.</div>
+  </div>
+</div>
+
+<script>
+const SHOP_SERVER = "https://pub-method-shop.onrender.com";
+
+const PLAN_INFO = {
+  "1day":      { label: "1 Día",      duration: "24 horas",   price: "3,00 €" },
+  "1week":     { label: "1 Semana",   duration: "7 días",     price: "8,00 €" },
+  "1month":    { label: "1 Mes",      duration: "30 días",    price: "15,00 €" },
+  "permanent": { label: "Permanente", duration: "Para siempre", price: "20,00 €" },
+};
+
+let selectedPlan = null;
+let paypalButtonsRendered = false;
+
+function selectPlan(planId, card) {
+  selectedPlan = planId;
+  document.querySelectorAll('.plan-card').forEach(c => c.classList.remove('selected'));
+  card.classList.add('selected');
+
+  const info = PLAN_INFO[planId];
+  document.getElementById('summary-plan').textContent = info.label;
+  document.getElementById('summary-duration').textContent = info.duration;
+  document.getElementById('summary-price').textContent = info.price;
+  document.getElementById('checkout').style.display = 'block';
+  document.getElementById('checkout').scrollIntoView({behavior:'smooth'});
+
+  if (!paypalButtonsRendered) {
+    paypalButtonsRendered = true;
+    renderPayPalButtons();
+  }
+}
+
+function showError(msg) {
+  const el = document.getElementById('checkout-error');
+  el.textContent = '❌ ' + msg;
+  el.style.display = 'block';
+}
+
+function hideError() {
+  document.getElementById('checkout-error').style.display = 'none';
+}
+
+function renderPayPalButtons() {
+  paypal.Buttons({
+    style: { layout: 'vertical', color: 'gold', shape: 'rect', label: 'pay' },
+
+    createOrder: async function() {
+      hideError();
+      const username = document.getElementById('roblox-username').value.trim();
+      if (!username) { showError('Introduce tu usuario de Roblox.'); throw new Error('no username'); }
+      if (!selectedPlan) { showError('Selecciona un plan.'); throw new Error('no plan'); }
+
+      const res = await fetch(`${SHOP_SERVER}/create-order`, {
+        method: 'POST',
+        headers: {'Content-Type':'application/json'},
+        body: JSON.stringify({ plan: selectedPlan, username })
+      });
+      const data = await res.json();
+      if (!data.success) { showError(data.error || 'Error creando orden'); throw new Error(data.error); }
+      return data.order_id;
+    },
+
+    onApprove: async function(data) {
+      const res = await fetch(`${SHOP_SERVER}/capture-order`, {
+        method: 'POST',
+        headers: {'Content-Type':'application/json'},
+        body: JSON.stringify({ order_id: data.orderID })
+      });
+      const result = await res.json();
+      if (!result.success) { showError(result.error || 'Error capturando pago'); return; }
+
+      document.getElementById('result-key').textContent = result.key;
+      document.getElementById('result-expiry').textContent = result.expiry;
+      document.getElementById('checkout').style.display = 'none';
+      document.getElementById('success-screen').style.display = 'block';
+      document.getElementById('success-screen').scrollIntoView({behavior:'smooth'});
+    },
+
+    onError: function(err) {
+      showError('Error en el pago. Inténtalo de nuevo.');
+    },
+
+    onCancel: function() {
+      showError('Pago cancelado.');
+    }
+  }).render('#paypal-button-container');
+}
+
+function copyResultKey() {
+  const key = document.getElementById('result-key').textContent;
+  navigator.clipboard.writeText(key).then(() => {
+    const btn = document.querySelector('.copy-key-btn');
+    btn.textContent = '✅ ¡Copiada!';
+    setTimeout(() => btn.textContent = '📋 Copiar Key', 2000);
+  });
+}
+</script>
+</body>
+</html>
