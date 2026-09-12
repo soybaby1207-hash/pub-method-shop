@@ -15,7 +15,7 @@ CORS(app)
 # =============================================
 PAYPAL_CLIENT_ID = "BAAzWJz48BhTIWoJpwEqbHujgoY1eGMFoSEOpu_Tb_TSpLWTmiqYwnxCrtniXM_SQfSrPp2BMQ8jvfaPYg"
 PAYPAL_SECRET    = "EJvMXpEkS1tAmcCtUt2ST37if53_VW1-SLpoKWClwIQ8UcE0G_QV0IYHEU225KxEWoXZozSIaEymKxZz"
-PAYPAL_BASE      = "https://api-m.paypal.com"  # live
+PAYPAL_BASE = "https://api-m.sandbox.paypal.com"  # sandbox
 
 ADMIN_SERVER     = "https://admin-key-server-1.onrender.com"
 ADMIN_PASSWORD   = "soybaby12071207"
